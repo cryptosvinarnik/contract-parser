@@ -1,32 +1,35 @@
-import json
-import os
+import asyncio
+import csv
 
-from etherscan import EtherScan
+from etherscan import EtherScan, AsyncEtherScan
+
+from utils import sync_save_contract, worker
 
 
 if __name__ == "__main__":
-    ether = EtherScan("API_KEY")  # <--- input your API_KEY from etherscan.io
+    API_KEY = ""  # <--- input your API_KEY from etherscan.io
 
-    address = input("Input address of a verified smart contract: ")
+    match input("Choise parsing type(1 - sync, 2 - async (!WARNING!): "):
+        case "1":
+            address = input("Input address of a verified smart contract: ")
 
-    source = ether.get_source_code(address)
+            try:
+                sync_save_contract(EtherScan(API_KEY), address)
+            except KeyboardInterrupt:
+                pass
+        case "2":
+            with open("export-verified-contractaddress-opensource-license.csv") as file:
+                reader = csv.reader(file)
+                data = [row for row in reader]
 
-    try:
-        source_code = json.loads(source["result"][0]["SourceCode"])
-    except json.decoder.JSONDecodeError:
-        source_code = json.loads(source["result"][0]["SourceCode"][1:-1])
+            contracts = [contract for _, contract, _ in data[2:]]
 
-    source_code = source_code["sources"] if source_code.get("sources") else source_code
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
 
-    contract_name = source["result"][0]["ContractName"]
-    abi = source["result"][0]["ABI"]
-
-    if not os.path.exists(contract_name):
-        os.mkdir(contract_name)
-
-    for filename in source_code:
-        with open(f"{contract_name}/{filename.split('/')[-1]}", "w+") as f:
-            f.write(source_code[filename]["content"])
-
-    with open(f"{contract_name}/abi.json", "w+") as f:
-        f.write(abi)
+            try:
+                loop.run_until_complete(worker(AsyncEtherScan(API_KEY), contracts))
+            except KeyboardInterrupt:
+                pass
+        case _:
+            exit()
