@@ -59,4 +59,6 @@ def save_contract(ether: EVMScan, address: str):
 
     shutil.rmtree(contract_name)
 
+    logger.success(f"{contract_name} saved!")
+
     return f"contracts/{contract_name}.zip"
