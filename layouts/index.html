@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contract Parser</title>
+</head>
+
+<body>
+    <form action="" method="post" class="form">
+        <div class="form">
+            <label for="api-key">Enter your API KEY: </label>
+            <input type="text" name="api-key" id="api-key" required>
+        </div>
+        <div class="form">
+            <label for="address">Enter address of a verified smart contract: </label>
+            <input type="text" name="address" id="address" required>
+        </div>
+        <div>
+            <input type="radio" id="endpoint1" name="endpoint" value="https://api.etherscan.io" checked>
+            <label for="contactChoice1">Ethereum</label>
+
+            <input type="radio" id="endpoint1" name="endpoint" value="https://api.bscscan.com">
+            <label for="contactChoice2">Binance Smart Chain</label>
+
+            <input type="radio" id="endpoint1" name="endpoint" value="https://api.polygonscan.com">
+            <label for="contactChoice3">Polygon</label>
+        </div>
+        <div class="form">
+            <input type="submit" value="Download">
+        </div>
+    </form>
+
+</body>
+
+</html>

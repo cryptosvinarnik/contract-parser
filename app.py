@@ -1,17 +1,26 @@
-from scan_api import EVMScan
+from flask import Flask, request, send_file
 
-from utils import save_contract
+from utils.saving import save_contract
+from utils.scan_api import EVMScan
 
-endpoints = {"1": "https://api.etherscan.io", "2": "https://api.bscscan.com", "3": "https://api.polygonscan.com"}
+app = Flask(__name__, static_folder="contracts")
 
+
+with open("layouts/index.html") as f:
+    html = f.read()
+
+@app.route('/', methods=['GET', 'POST'])
+def index():
+    if request.method == "POST":
+        api_key = request.form.get("api-key")
+        contract = request.form.get("address")
+        endpoint = request.form.get("endpoint")
+
+        file = save_contract(EVMScan(api_key, endpoint), contract.lower())
+
+        return send_file(file, as_attachment=True)
+
+    return html
 
 if __name__ == "__main__":
-    API_KEY = ""  # <--- input your API_KEY from etherscan.io
-
-    endpoint =  input("Choise endpoint (1 - ether, 2 - bsc, 3 - polygon): ")
-    address = input("Input address of a verified smart contract: ")
-
-    try:
-        save_contract(EVMScan(API_KEY, endpoints[endpoint]), address)
-    except KeyboardInterrupt:
-        pass
+    app.run()
