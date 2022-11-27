@@ -3,6 +3,8 @@ import os
 import shutil
 from zipfile import ZipFile
 
+import httpx
+from bs4 import BeautifulSoup
 from loguru import logger
 
 from utils.scan_api import EVMScan
@@ -14,6 +16,19 @@ def is_json(string: str) -> bool:
     except ValueError as e:
         return False
     return True
+
+
+def get_contract_bytecode(endpoint: str, address: str) -> str:
+    page = httpx.get(f"{endpoint}/address/{address}")
+    soup = BeautifulSoup(page.text, "html.parser")
+
+    return soup.find("div", {"id": "verifiedbytecode2"}).text
+
+
+def get_contract_abi(ether: EVMScan, address: str):
+    source = ether.get_source_code(address)
+
+    return source["result"][0]["ABI"]
 
 
 def save_contract(ether: EVMScan, address: str):

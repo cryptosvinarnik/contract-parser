@@ -6,7 +6,7 @@ from utils.scan_api import EVMScan
 app = Flask(__name__, static_folder="contracts")
 
 
-with open("layouts/index.html") as f:
+with open("templates/index.html") as f:
     html = f.read()
 
 @app.route('/', methods=['GET', 'POST'])
